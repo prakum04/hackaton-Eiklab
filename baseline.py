@@ -20,7 +20,7 @@ def les(sti):
         return list(csv.DictReader(f))
 
 
-def er_mot(rad, kolonne="stemme"):
+def er_mot(rad, kolonne="nbim_vote_raw"):
     return rad.get(kolonne, "").strip().lower() in MOT
 
 
@@ -29,7 +29,7 @@ def rapport(rader, prediksjoner=None):
     Utelates den, rapporteres baselinen (alltid FOR)."""
     faktisk = [er_mot(r) for r in rader]
     if prediksjoner is None:
-        prediksjoner = [False] * len(rader)
+        prediksjoner = [er_mot(r, "mgmt_rec_raw") for r in rader]
 
     tp = sum(1 for p, f in zip(prediksjoner, faktisk) if p and f)
     fp = sum(1 for p, f in zip(prediksjoner, faktisk) if p and not f)
