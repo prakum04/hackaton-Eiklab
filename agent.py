@@ -140,8 +140,14 @@ def ord_i(tekst):
     return [w for w in ORD.findall(tekst.lower()) if w not in STOPP]
 
 
+GVG_FIL = ROT / "retningslinjer" / "gvg_2024.json"
+
+
 def bygg_korpus(train):
-    """Bygg GVG-korpus fra TRENINGSPERIODEN: seksjonstekst + forslag som siterte den."""
+    """GVG-korpus: alle 18 seksjoner i NBIM Global Voting Guidelines 2024 (tittel, hovedsitat,
+    noekkelord), beriket med NBIMs egne begrunnelser og forslagene de ble brukt paa - bare fra
+    TRENINGSPERIODEN."""
+    gvg = json.load(open(GVG_FIL, encoding="utf-8"))
     tekster = collections.defaultdict(collections.Counter)
     forslag = collections.defaultdict(list)
     for r in train:
@@ -150,10 +156,11 @@ def bygg_korpus(train):
             tekster[s][r["fasit_begrunnelse"].strip()] += 1
             forslag[s].append(r["forslag"])
     korpus = {}
-    for s in sorted(tekster):
-        sitat = tekster[s].most_common(1)[0][0]
-        korpus[s] = {"sitat": sitat, "dokument": sitat + " " + " ".join(forslag[s]), "n_brukt": len(forslag[s])}
-    # Fallback naar ingen seksjon passer: den generelle informasjonsregelen
+    for s, d in gvg["seksjoner"].items():
+        begr = tekster[s].most_common(1)[0][0] if tekster[s] else ""
+        dok = " ".join([d["tittel"], d["sitat"], d["nokkelord"], begr] + forslag[s])
+        korpus[s] = {"tittel": d["tittel"], "side": d["side"], "sitat": d["sitat"],
+                     "kilde": f"{gvg['kilde']}, s. {d['side']}", "dokument": dok, "n_brukt": len(forslag[s])}
     return korpus
 
 
@@ -403,8 +410,10 @@ def last_modell():
 
 
 def anbefalt_stemme(mot, styret):
+    """FOR / MOT / AVSTAA. Uten anbefaling fra styret finnes ingen 'med styret'-stemme
+    aa falle tilbake paa, og GVG 5.2 sier at vi ikke stoetter punkter vi ikke kan vurdere -> AVSTAA."""
     if styret not in ("FOR", "AGAINST"):
-        return "MENNESKE"
+        return "AVSTÅ"
     if mot:
         return "MOT" if styret == "FOR" else "FOR"
     return "FOR" if styret == "FOR" else "MOT"
@@ -434,20 +443,28 @@ def vurder(rader, m, korpus, gj, hist):
             rute, pred = "MENNESKE", ""
         else:
             rute, pred = "AGENT", "0"
-        if r["styrets_anbefaling"] not in ("FOR", "AGAINST") and rute == "AGENT":
+        uten_anbefaling = r["styrets_anbefaling"] not in ("FOR", "AGAINST")
+        if uten_anbefaling:
             rute, pred = "MENNESKE", ""
+            regel = regel or "Styret har ikke gitt anbefaling: foreslår AVSTÅ til et menneske har vurdert punktet"
+            if g == "INGEN" and "GVG 5.2" in korpus:
+                g = "GVG 5.2"  # punkt agenten ikke kan vurdere: ikke stoett uten informasjon
         mot = p >= m["t_mot"]
         konf = p if mot else 1 - p
-        sitat = korpus.get(g, {}).get("sitat", "")
+        # Alle forslag faar en stemme (FOR / MOT / AVSTAA). Naar saken rutes til menneske er den
+        # foreloepig: agentens retning (P >= 0,5) som utgangspunkt for den som bekrefter.
+        stemme = anbefalt_stemme(mot if rute == "AGENT" else p >= 0.5, r["styrets_anbefaling"])
+        seksjon = korpus.get(g, {})
         ut.append({
             "id": r["id"], "pred_mot": pred, "pred_mot_uten_menneske": "1" if mot else "0",
-            "anbefaling": anbefalt_stemme(mot, r["styrets_anbefaling"]) if rute == "AGENT" else "MENNESKE",
+            "anbefaling": stemme, "foreloepig": int(rute == "MENNESKE"),
             "rute": rute, "p_mot": round(p, 4), "konfidens": round(konf, 3),
             "utsteder": r["utsteder"], "moetedato": r["moetedato"], "land": r.get("land", ""),
             "forslag": original, "styrets_anbefaling": r["styrets_anbefaling"], "type": typ,
-            "retningslinje": g,
+            "retningslinje": g, "retningslinje_tittel": seksjon.get("tittel", ""),
+            "retningslinje_kilde": seksjon.get("kilde", ""),
             "retningslinje_rolle": ("avgjoer: grunnlag for MOT" if mot else "vurdert: ingen motstrid funnet"),
-            "retningslinje_sitat": sitat[:300],
+            "retningslinje_sitat": seksjon.get("sitat", "")[:300],
             "alternative_seksjoner": "; ".join(f"{s} ({sc})" for s, sc in treff[1:]),
             "begrunnelse": regel or bidrag(w, x, mot),
             "injeksjon_funnet": int(inj),
@@ -584,9 +601,10 @@ def kmd_demo(a):
 def vis(ut):
     for r in ut:
         flagg = "  ⚠ INSTRUKSJON I TEKSTEN - til menneske" if r["injeksjon_funnet"] else ""
-        print(f"\n[{r['anbefaling']:8}] {r['forslag'][:100]}{flagg}")
+        merke = f"STEM {r['anbefaling']}" + (" – foreløpig, til menneske" if r["foreloepig"] else "")
+        print(f"\n[{merke}] {r['forslag'][:100]}{flagg}")
         print(f"   type {r['type']}, P(mot styret) {r['p_mot']:.2f}, konfidens {r['konfidens']:.2f}, rute {r['rute']}")
-        print(f"   {r['retningslinje']} ({r['retningslinje_rolle']}): «{r['retningslinje_sitat'][:180]}...»")
+        print(f"   {r['retningslinje']} {r['retningslinje_tittel']} ({r['retningslinje_rolle']}): «{r['retningslinje_sitat']}»")
         print(f"   hvorfor: {r['begrunnelse'] or '-'}")
 
 

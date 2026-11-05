@@ -228,3 +228,6 @@ test.csv
 # Genererte filer
 modell/
 data/votes_nbim.csv
+
+# NBIMs PDF lastes ned fra nbim.no (se README), legges ikke i repoet
+retningslinjer/*.pdf

@@ -247,11 +247,13 @@ addEventListener("hashchange", visFane);
 
 /* ---------- felles: anbefaling og utfall ---------- */
 function merke(x) {
-  if (x.rute === "MENNESKE") return `<span class="merke menneske">Til menneske</span>`;
+  if (x.rute === "MENNESKE") return `<span class="merke menneske" data-tip="${esc("Agenten er usikker eller har stoppet saken. Stemmen er et foreløpig forslag som et menneske må bekrefte.")}">Til menneske · foreløpig ${esc(x.anbefaling)}</span>`;
   return x.pred_mot === "1"
     ? `<span class="merke mot">Mot styret · stem ${esc(x.anbefaling)}</span>`
     : `<span class="merke med">Med styret · stem ${esc(x.anbefaling)}</span>`;
 }
+const gvgTittel = x => `<b>${esc(x.retningslinje)}${x.retningslinje_tittel ? " " + esc(x.retningslinje_tittel) : ""}</b>`;
+const gvgKilde = x => x.retningslinje_kilde ? `<div style="font-size:11.5px;color:var(--muted);margin-top:2px">${esc(x.retningslinje_kilde)}</div>` : "";
 const UTFALL = {riktig: "✓ Riktig", feil: "✕ Feil", menneske: "⚠ Til menneske", ukjent: "– Ingen fasit"};
 const rolle = s => String(s || "").replace("avgjoer", "avgjør");
 
@@ -442,8 +444,8 @@ function vekslDetalj(tr, x) {
   d.innerHTML = `<td colspan="8"><div class="dgrid">
     <div><h4>Agentens begrunnelse</h4>
       <div>Type <b>${esc(x.type)}</b> · P(mot styret) ${pst(x.p_mot)} · konfidens ${pst(x.konfidens)}</div>
-      <div style="margin-top:6px"><b>${esc(x.retningslinje)}</b> <span style="color:var(--ink2)">(${esc(rolle(x.retningslinje_rolle))})</span></div>
-      <div class="sitat">«${esc(x.retningslinje_sitat)}${x.retningslinje_sitat.length >= 300 ? " …" : ""}»</div>
+      <div style="margin-top:6px">${gvgTittel(x)} <span style="color:var(--ink2)">(${esc(rolle(x.retningslinje_rolle))})</span></div>
+      <div class="sitat">«${esc(x.retningslinje_sitat)}»</div>${gvgKilde(x)}
       ${hvorfor(x.begrunnelse)}</div>
     <div><h4>NBIMs faktiske stemme</h4>
       <div>Stemte <b>${esc(x.nbim) || "–"}</b>, styret anbefalte <b>${esc(x.styret) || "–"}</b>${x.nbim_mot === "1" ? " – altså mot styret" : x.nbim_mot === "0" ? " – altså med styret" : ""}.</div>
@@ -562,7 +564,8 @@ function visEgen(rs) {
   const mot = rs.filter(r => r.rute === "AGENT" && r.pred_mot === "1").length;
   const men = rs.filter(r => r.rute === "MENNESKE").length;
   const inj = rs.filter(r => r.injeksjon_funnet).length;
-  const tiles = [[rs.length, "forslag"], [mot, "mot styret"], [rs.length - mot - men, "med styret"], [men, "til menneske"], [inj, "injeksjoner stoppet"]];
+  const avst = rs.filter(r => r.anbefaling === "AVSTÅ").length;
+  const tiles = [[rs.length, "forslag"], [mot, "mot styret"], [rs.length - mot - men, "med styret"], [men, "til menneske"], [avst, "foreslått AVSTÅ"], [inj, "injeksjoner stoppet"]];
   if (EKTE) {
     const u = rs.map(r => utfallFor(r, EKTE.fasit.get(r.forslag)));
     const nbimMot = rs.filter(r => (EKTE.fasit.get(r.forslag) || {}).nbim_mot === "1").length;
@@ -580,8 +583,8 @@ function visEgen(rs) {
         <span class="utfall ${u}">${UTFALL[u]}</span>
         ${p.nbim_begrunnelse ? `<span style="color:var(--ink2)">NBIMs begrunnelse: <b>${esc(p.nbim_seksjon)}</b>${p.nbim_seksjon === r.retningslinje ? " ✓ samme som agenten" : ""}</span>` : ""}</div>` : ""}
       <div class="meta"><span>P(mot styret) <b>${pst(r.p_mot)}</b></span><span>Konfidens ${pst(r.konfidens)}</span><span>Type ${esc(r.type)}</span><span>Styret anbefaler ${esc(r.styrets_anbefaling)}</span></div>
-      <div style="margin-top:7px;font-size:13px"><b>${esc(r.retningslinje)}</b> <span style="color:var(--ink2)">(${esc(rolle(r.retningslinje_rolle))})</span>
-        <div class="sitat">«${esc(r.retningslinje_sitat)}${r.retningslinje_sitat.length >= 300 ? " …" : ""}»</div></div>
+      <div style="margin-top:7px;font-size:13px">${gvgTittel(r)} <span style="color:var(--ink2)">(${esc(rolle(r.retningslinje_rolle))})</span>
+        <div class="sitat">«${esc(r.retningslinje_sitat)}»</div>${gvgKilde(r)}</div>
       ${hvorfor(r.begrunnelse)}
     </div>`;
   }).join("");
