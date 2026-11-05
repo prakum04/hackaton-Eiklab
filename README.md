@@ -99,8 +99,8 @@ python agent.py motstandstest test.csv
 
 | Fil | Innhold | Kilde |
 |---|---|---|
-| `data/real_votes.csv` | NBIMs faktiske stemmer 2019–2026 med begrunnelse og GVG-seksjon (13 757 forslag) | TODO: URL |
-| `data/npx_votes.csv` | Stemmer fra SEC Form N-PX i samme format (52 906 forslag), ikke brukt i hovedresultatet | TODO: URL |
+| `data/real_votes.csv` | NBIMs faktiske stemmer 2019–2026 med begrunnelse og GVG-seksjon (13 757 forslag) | Utdelt av arrangøren (Eik Lab / NBIM) som del av case 1 |
+| `data/npx_votes.csv` | Stemmer fra SEC Form N-PX i samme format (52 906 forslag), ikke brukt i hovedresultatet | Utdelt av arrangøren (Eik Lab / NBIM) som del av case 1 |
 
 - NBIM Voting: https://www.nbim.no/en/responsible-investment/voting/
 - NBIM Global Voting Guidelines: https://www.nbim.no/en/responsible-investment/voting/our-voting-guidelines/
