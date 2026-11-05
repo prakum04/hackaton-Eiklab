@@ -1,0 +1,36 @@
+"""Profilering av arrangorens filer: omfang, maalvariabel, lekkasje og datakvalitet."""
+import pandas as pd
+pd.set_option("display.width",220); pd.set_option("display.max_columns",40); pd.set_option("display.max_colwidth",110); pd.set_option("display.max_rows",80)
+for navn in ["real_votes","npx_votes"]:
+    d=pd.read_csv(f"data/arrangor/{navn}.csv",dtype=str,keep_default_na=False)
+    ab=pd.to_numeric(d.against_board,errors="coerce")
+    print(f"\n{'='*30} {navn}: {d.shape}")
+    print("tomme celler per kolonne:",{c:int((d[c]=='').sum()) for c in d.columns if (d[c]=='').sum()})
+    print("moter:",d.meeting_id.nunique(),"selskaper:",d.company_id.nunique(),"datoer:",d.meeting_date.min(),"-",d.meeting_date.max())
+    print("market:",d.market.value_counts().to_dict())
+    print("land topp:",d.country.value_counts().head(6).to_dict())
+    print("proponent:",d.proponent.value_counts().head(6).to_dict())
+    print("nbim_vote:",d.nbim_vote.value_counts().to_dict())
+    print("nbim_vote_raw:",d.nbim_vote_raw.value_counts().head(10).to_dict())
+    print("mgmt_rec:",d.mgmt_rec.value_counts().to_dict())
+    print("mgmt_rec_raw:",d.mgmt_rec_raw.value_counts().head(10).to_dict())
+    print("against_board:",d.against_board.value_counts().to_dict())
+    print("\nmgmt_rec x nbim_vote"); print(pd.crosstab(d.mgmt_rec,d.nbim_vote))
+    print("\nsamsvar against_board med (nbim_vote!=mgmt_rec):")
+    print(pd.crosstab(d.against_board,(d.nbim_vote!=d.mgmt_rec)))
+    t=d.assign(ab=ab).groupby("year").agg(n=("ab","size"),n_ab=("ab","count"),mot=("ab","sum"),andel=("ab","mean"),rasjonale=("rationale_text",lambda s:(s!="").sum()))
+    print("\nper aar"); print(t.round(3))
+    t=d.assign(ab=ab).groupby("proposal_type").agg(n=("ab","size"),mot=("ab","sum"),andel=("ab","mean")).sort_values("n",ascending=False)
+    print("\nper proposal_type"); print(t.round(3))
+    if "split_year" in d: print("\nsplit_year:",d.split_year.value_counts().to_dict(),"| n_funds:",d.n_funds.value_counts().head(6).to_dict(),"| funds_disagree:",d.funds_disagree.value_counts().to_dict())
+    print("\nrasjonale fylt:",(d.rationale_text!="").sum(),"| av dem against_board=1:",((d.rationale_text!="")&(ab==1)).sum(),"| against_board=1 uten:",((d.rationale_text=="")&(ab==1)).sum())
+    print("position_paper:",d.position_paper.value_counts().head(8).to_dict()); print("rationale_section:",d.rationale_section.value_counts().head(10).to_dict())
+    print("injection_flag:",d.injection_flag.value_counts().to_dict())
+    print("duplikater (mote+item):",d.duplicated(["meeting_id","item_no"]).sum(),"| hele rader:",d.duplicated().sum())
+    x=d[d.injection_flag!="0"]
+    if len(x):
+        print("\nInjection-rader: stemme og styre"); print(pd.crosstab(x.mgmt_rec,x.nbim_vote))
+        print(x.sample(min(4,len(x)),random_state=1)[["company","meeting_date","proposal_text","nbim_vote","mgmt_rec"]].to_string())
+    y=d[(ab==1)&(d.rationale_text!="")]
+    if len(y): print("\nEksempler paa begrunnelser:"); print(y.sample(min(4,len(y)),random_state=2)[["company","meeting_date","proposal_type","proposal_text","rationale_text","position_paper"]].to_string())
+    print("\nmaks tekstlengde forslag:",d.proposal_text.str.len().max(),"| rasjonale:",d.rationale_text.str.len().max())

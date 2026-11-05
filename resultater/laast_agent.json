@@ -1,0 +1,11 @@
+{
+ "fingeravtrykk": "f9a1efc7351f3a899580950a4afe12bb668d27402abe6e9330d8ab478460ee63",
+ "system_hash": "0ab0af62e4d9",
+ "terskel": 0.8,
+ "sekundaer_grense": 0.9,
+ "modell": "claude-opus-5-5",
+ "innsats": "medium",
+ "real_votes_sha256": "71ba5135e7ba9d64c943f158bb510ffab53f34203f4c2875fc43352419e525e6",
+ "regler_sha256": "b65542d7b4b1ca61ed9d980640bbd609293a5502b034482255871af47ea419a4",
+ "laast": "2026-11-05T13:07:30.756825+00:00"
+}

@@ -218,3 +218,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Stemmegivningsagenten: repoet er offentlig, så arrangørens data og svar per sak ligger bare i zip-filen
+data/arrangor/
+data/raw/
+resultater/logg_*.jsonl
+resultater/pred_*.csv
+resultater/app.log
+startpakke/
+levering/

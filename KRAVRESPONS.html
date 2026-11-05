@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="nb"><head><meta charset="utf-8"><title>Stemmegivningsagenten: kravrespons</title>
+<style>
+@page { size: A4; margin: 13mm 15mm 11mm; }
+body { font-family: "Liberation Sans", Arial, sans-serif; font-size: 9.6pt; line-height: 1.34; color: #111; margin: 0; }
+h1 { font-size: 15pt; margin: 0 0 1pt; }
+.meta { color: #444; font-size: 8.6pt; margin-bottom: 5pt; }
+.lead { font-weight: bold; margin: 0 0 3pt; }
+h2 { font-size: 11pt; margin: 9pt 0 2.5pt; border-bottom: 1px solid #999; padding-bottom: 1pt; }
+p { margin: 0 0 3.5pt; }
+ul { margin: 0 0 3pt; padding-left: 13pt; } li { margin-bottom: 1pt; }
+table { border-collapse: collapse; width: 100%; margin: 3pt 0 4pt; font-size: 8.7pt; }
+th, td { border: 1px solid #aaa; padding: 1.8pt 4pt; text-align: right; } th:first-child, td:first-child { text-align: left; }
+th { background: #eee; } tr.agent td { font-weight: bold; background: #f4f4f4; }
+code { font-family: "Liberation Mono", monospace; font-size: 8.3pt; }
+.fot { color: #444; font-size: 8.4pt; margin-top: 4pt; }
+</style></head><body>
+<h1>Stemmegivningsagenten: kravrespons</h1>
+<div class="meta">Case 1, FinTech Hackathon H2026 · Lag: [Gruppenavn] · 6. november 2026</div>
+<p class="lead">På 3 448 forslag fra 2025–2026 fant agenten 56,2 % av sakene der NBIM gikk mot styret, med 70,4 % presisjon.</p>
+<h2>Hva vi bygde</h2>
+<p>Agenten leser sakslisten til en generalforsamling og foreslår FOR, MOT eller AVSTÅ på hver sak, med sakstype, sitert regel fra NBIMs retningslinjer, begrunnelse og konfidens. Den støtter én beslutning: hvilke saker en analytiker må lese før NBIM stemmer. Saker med konfidens under 0,80 eller mistenkelig tekst går til et menneske, og agenten stemmer aldri selv. På 3 448 forslag fra 2025–2026 måtte et menneske se 6,9 % av sakene, og da var 66,9 % av sakene der NBIM gikk mot styret fanget, mot 47,3 % for tekstmodellen med samme lesemengde. Av de 3 209 sakene som slapp gjennom, gikk 56 (1,7 %) mot styret og ble oversett.</p>
+<h2>Hvordan vi verifiserte det</h2>
+<p>Målvariabelen er <code>against_board</code> i <code>real_votes.csv</code>, altså om NBIM stemte annerledes enn styret anbefalte (13 324 forslag, 193 selskaper, 2019–2026). Vi måler presisjon og recall fordi «alltid med styret» gir 95,1 % accuracy og 0 % recall. Agenten ble justert på 2023–2024, låst og kjørt én gang på 2025–2026 (3 448 saker, 169 mot styret).</p>
+<table><tr><th>Metode</th><th>Accuracy</th><th>Presisjon (95 %-intervall)</th><th>Recall (95 %-intervall)</th><th>Falske alarmer per treff</th></tr>
+<tr><td>Alltid med styret</td><td>95,1 %</td><td>0 %</td><td>0 %</td><td>–</td></tr>
+<tr><td>Sakstyper med minst 50 % mot i trening</td><td>95,4 %</td><td>73,9 %</td><td>10,1 %</td><td>0,35</td></tr>
+<tr><td>Mot på samme sakstype på forrige møte</td><td>85,1 %</td><td>16,5 %</td><td>50,3 %</td><td>5,05</td></tr>
+<tr><td>Enkel tekstmodell</td><td>84,3 %</td><td>18,1 %</td><td>62,7 %</td><td>4,52</td></tr>
+<tr class="agent"><td>Agenten</td><td>96,7 %</td><td>70,4 % (62,1–78,1)</td><td>56,2 % (45,5–65,3)</td><td>0,42</td></tr></table>
+<p>Bare på saker der styret sa FOR og NBIM sa MOT er presisjonen 68,8 % og recall 54,8 %. <code>real_votes</code> stemmer med Norges Banks SEC-filer i 90 av 92 say-on-pay-saker, mens <code>npx_votes</code> ikke brukes som fasit fordi 1 032 av 1 936 saker merket «mot styret» er aksjonærforslag der styret står som FOR.</p>
+<h2>Forklarbarhet og motstandstest</h2>
+<p>Regelen agenten siterer ligger i samme seksjon som NBIMs egen begrunnelse i 95,8 % av treffene (91 av 95), og hvert kall logges med prompt-hash, modell og råsvar. Vi la 50 skjulte instrukser og falske påstander inn i 16 tilfeldig trukne møter fra 2023–2024, med en nøytral kontroll i hvert møte. Ingen endret stemmen, og alle ble merket og sendt til et menneske. Ingen av de 16 kontrollene ga falsk alarm, men angrepene var ikke tilpasset agenten.</p>
+<h2>Begrensninger</h2>
+<ul>
+<li>Agenten finner mest gjentakelser: 88,2 % når NBIM gikk mot styret på samme sakstype på forrige møte, men 23,8 % på nye saker.</li>
+<li>Modellen kan huske utfall fra før kunnskapsgrensen i juni 2026, og etter den fant den 5 av 7 saker, som er for få til å utelukke dette.</li>
+<li>Vi kjenner ikke hvordan de 193 selskapene er valgt, så tallene gjelder ikke nødvendigvis hele porteføljen.</li>
+<li>AVSTÅ kan ikke forutsies (5 saker i fasiten, ingen treff), og retningslinjene fra 2024 brukes på alle år.</li>
+<li>Hele retningslinjen ligger i prompten i stedet for RAG, og posisjonsnotatene er ikke med.</li>
+</ul>
+<h2>Hva vi ville trengt videre</h2>
+<p><b>Data:</b> Vi trenger fakta om styret (uavhengighet, oppmøte, verv) og innkallingene (DEF 14A), fordi mange regler krever dette. <b>Tilgang:</b> NBIMs komplette stemmedatabase og tidligere utgaver av retningslinjene ville gjort at hvert år kan vurderes mot reglene som gjaldt da. <b>Tid:</b> Med mer tid ville vi kjørt skyggedrift på kommende møter, der forslaget låses før NBIM publiserer stemmen. Vi ville brukt agenten til å sortere saker for en analytiker, ikke til å stemme.</p>
+<p class="fot">Reproduser resultatet med <code>python reproduser.py</code>. Kilder og AI-bruk står i README.</p>
+</body></html>

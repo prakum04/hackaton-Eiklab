@@ -1,0 +1,97 @@
+{
+ "sett": "dev",
+ "resultater": {
+  "Alltid med styret": {
+   "accuracy": 0.9503293084522503,
+   "presisjon": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 181,
+   "flagget": 0,
+   "recall_ki": [
+    0.0,
+    0.0
+   ],
+   "presisjon_ki": [
+    0.0,
+    0.0
+   ]
+  },
+  "Sakstype med minst 50 % mot i trening": {
+   "accuracy": 0.955543358946213,
+   "presisjon": 0.88,
+   "recall": 0.12154696132596685,
+   "tp": 22,
+   "fp": 3,
+   "fn": 159,
+   "flagget": 25,
+   "recall_ki": [
+    0.07175480769230769,
+    0.1786948572776598
+   ],
+   "presisjon_ki": [
+    0.761463963963964,
+    1.0
+   ]
+  },
+  "MOT paa samme sakstype paa forrige moete": {
+   "accuracy": 0.8265642151481888,
+   "presisjon": 0.13333333333333333,
+   "recall": 0.4530386740331492,
+   "tp": 82,
+   "fp": 533,
+   "fn": 99,
+   "flagget": 615,
+   "recall_ki": [
+    0.34704974068835454,
+    0.570737119353442
+   ],
+   "presisjon_ki": [
+    0.09378450421054367,
+    0.17571356128658358
+   ]
+  },
+  "Tekstmodell (logistisk regresjon, terskel 0,5)": {
+   "accuracy": 0.8594950603732162,
+   "presisjon": 0.2039355992844365,
+   "recall": 0.6298342541436464,
+   "tp": 114,
+   "fp": 445,
+   "fn": 67,
+   "flagget": 559,
+   "recall_ki": [
+    0.5273054946515182,
+    0.7560642482517482
+   ],
+   "presisjon_ki": [
+    0.158451281013031,
+    0.26695098996095923
+   ]
+  },
+  "AGENT": {
+   "accuracy": 0.9374313940724479,
+   "presisjon": 0.39555555555555555,
+   "recall": 0.49171270718232046,
+   "tp": 89,
+   "fp": 136,
+   "fn": 92,
+   "flagget": 225,
+   "recall_ki": [
+    0.3822229060881161,
+    0.6031638177166376
+   ],
+   "presisjon_ki": [
+    0.2725034754402224,
+    0.5993309859154929
+   ]
+  }
+ },
+ "agent": {
+  "til_menneske": 0,
+  "til_menneske_andel": 0.0,
+  "mot_blant_til_menneske": 0,
+  "sitat_vurdert": 89,
+  "sitat_riktig_seksjon": 0.9662921348314607
+ }
+}

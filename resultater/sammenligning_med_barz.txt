@@ -1,0 +1,38 @@
+Barz: 2642 saker | vår test: 3448 | felles: 2642 | Barz uten treff hos oss: 0, første dato 2025-05-14
+Felles saker: 2642, mot styret 123 (4.7%), møter 239, fra 2025-05-14 til 2026-09-30
+
+A) Uten menneske
+  Vår agent                                      flagg  103 treff   67 falske   36 presisjon  65.0% (55.5%-74.7%) recall  54.5% (44.7%-64.7%) F1 0.593
+  Barz, svarer på alt                            flagg   91 treff   48 falske   43 presisjon  52.7% (41.6%-63.9%) recall  39.0% (28.8%-48.9%) F1 0.449
+  Barz, egne flagg (pred_mot)                    flagg   91 treff   48 falske   43 presisjon  52.7% (41.6%-63.9%) recall  39.0% (28.8%-48.9%) F1 0.449
+
+B) Rangering: AP vår 0.533 | Barz 0.410 | tilfeldig 0.047
+
+C) Arbeidsdeling
+  Vår, grense 0,80         menneske  177 egne flagg  14 leser   7.2% fanger  83 (67.5%) oversett 40 av 2451 (1.6%)
+  Barz, tersklene deres    menneske  281 egne flagg  91 leser  14.1% fanger  73 (59.3%) oversett 50 av 2270 (2.2%)
+
+D) Samme lesemengde, rangert på risiko: andel fanget
+    leser     vår    Barz snitt rang
+     2.0%   30.1%   29.3%      30.9%
+     5.0%   61.0%   44.7%      50.4%
+     6.9%   67.5%   48.0%      58.5%
+    10.6%   73.2%   56.9%      66.7%
+    15.0%   79.7%   60.2%      69.9%
+    20.0%   81.3%   65.9%      74.8%
+    30.0%   85.4%   75.6%      82.1%
+  AP snitt av rangering (utforskende, valgt etter å ha sett test): 0.511
+
+E) Overlapp i treff: begge 41 | bare vår 26 | bare Barz 7 | ingen 49
+
+F) Sitat, samme nevner: alle saker der NBIM gikk mot styret og oppga seksjon
+  Antall 120 | vår regel i samme seksjon 54.2% | Barz toppseksjon 65.0% | Barz topp 3 80.0%
+  Bare der vår agent flagget: 67, vår 97.0% | Barz toppseksjon der Barz flagget: 91.7%
+
+G) Gjentakelser og nye saker
+  Vår   gjentakelser 50 av 57 (87.7%) | nye 17 av 66 (25.8%) | falske på sakstype uten MOT sist: 7
+  Barz  gjentakelser 34 av 57 (59.6%) | nye 14 av 66 (21.2%) | falske på sakstype uten MOT sist: 22
+
+H) Etter kunnskapsgrensen (fra 01.07.2026)
+  Vår   saker 166 mot 7 flagg 7 treff 5
+  Barz  saker 166 mot 7 flagg 6 treff 1

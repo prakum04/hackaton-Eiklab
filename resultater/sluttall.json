@@ -1,0 +1,654 @@
+{
+ "laas": {
+  "fingeravtrykk": "f9a1efc7351f3a899580950a4afe12bb668d27402abe6e9330d8ab478460ee63",
+  "system_hash": "0ab0af62e4d9",
+  "terskel": 0.8,
+  "sekundaer_grense": 0.9,
+  "modell": "claude-opus-5-5",
+  "innsats": "medium",
+  "real_votes_sha256": "71ba5135e7ba9d64c943f158bb510ffab53f34203f4c2875fc43352419e525e6",
+  "regler_sha256": "b65542d7b4b1ca61ed9d980640bbd609293a5502b034482255871af47ea419a4",
+  "laast": "2026-11-05T13:07:30.756825+00:00"
+ },
+ "saker": 3448,
+ "moter": 310,
+ "mot_styret": 169,
+ "andel_mot": 0.049013921113689095,
+ "baseliner": {
+  "Alltid med styret": {
+   "accuracy": 0.9509860788863109,
+   "presisjon": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 169,
+   "flagget": 0,
+   "recall_ki": [
+    0.0,
+    0.0
+   ],
+   "presisjon_ki": [
+    0.0,
+    0.0
+   ]
+  },
+  "Sakstype med minst 50 % mot i trening": {
+   "accuracy": 0.9541763341067285,
+   "presisjon": 0.7391304347826086,
+   "recall": 0.10059171597633136,
+   "tp": 17,
+   "fp": 6,
+   "fn": 152,
+   "flagget": 23,
+   "recall_ki": [
+    0.05603321934538349,
+    0.14690696930946293
+   ],
+   "presisjon_ki": [
+    0.5576666666666668,
+    0.9216153846153846
+   ]
+  },
+  "Mot på samme sakstype på forrige møte": {
+   "accuracy": 0.8512180974477959,
+   "presisjon": 0.16536964980544747,
+   "recall": 0.5029585798816568,
+   "tp": 85,
+   "fp": 429,
+   "fn": 84,
+   "flagget": 514,
+   "recall_ki": [
+    0.40810168895144266,
+    0.604868041694389
+   ],
+   "presisjon_ki": [
+    0.13068080074741617,
+    0.2135225129992572
+   ]
+  },
+  "Tekstmodell (logistisk regresjon, terskel 0,5)": {
+   "accuracy": 0.8428074245939675,
+   "presisjon": 0.1811965811965812,
+   "recall": 0.6272189349112426,
+   "tp": 106,
+   "fp": 479,
+   "fn": 63,
+   "flagget": 585,
+   "recall_ki": [
+    0.5294817073170732,
+    0.7298975545274289
+   ],
+   "presisjon_ki": [
+    0.1404896665564821,
+    0.23185382539091584
+   ]
+  }
+ },
+ "ap": {
+  "agent": 0.578121125457691,
+  "tekstmodell": 0.36143595563746794,
+  "tilfeldig": 0.049013921113689095
+ },
+ "uten_grense": {
+  "accuracy": 0.9669373549883991,
+  "presisjon": 0.7037037037037037,
+  "recall": 0.5621301775147929,
+  "tp": 95,
+  "fp": 40,
+  "fn": 74,
+  "flagget": 135,
+  "recall_ki": [
+   0.45478804902962205,
+   0.6534102109205597
+  ],
+  "presisjon_ki": [
+   0.6211323392357875,
+   0.7810466609589041
+  ]
+ },
+ "hoved": {
+  "grense": 0.8,
+  "saker": 3448,
+  "mot_styret": 169,
+  "til_menneske": 217,
+  "til_menneske_andel": 0.06293503480278423,
+  "mot_i_menneskebunken": 95,
+  "egne_flagg": {
+   "accuracy": 0.955046403712297,
+   "presisjon": 0.8181818181818182,
+   "recall": 0.10650887573964497,
+   "tp": 18,
+   "fp": 4,
+   "fn": 151,
+   "flagget": 22,
+   "recall_ki": [
+    0.06143935818782445,
+    0.1604826481274854
+   ],
+   "presisjon_ki": [
+    0.64,
+    0.9583333333333334
+   ]
+  },
+  "leses": 239,
+  "leses_andel": 0.06931554524361949,
+  "fanger": {
+   "accuracy": 0.947215777262181,
+   "presisjon": 0.47280334728033474,
+   "recall": 0.6686390532544378,
+   "tp": 113,
+   "fp": 126,
+   "fn": 56,
+   "flagget": 239,
+   "recall_ki": [
+    0.5576162790697674,
+    0.7657812499999999
+   ],
+   "presisjon_ki": [
+    0.40700399569694173,
+    0.5451647058823529
+   ]
+  },
+  "oversett": 56,
+  "slipper_gjennom": 3209,
+  "andel_oversett_av_sluppet": 0.017450919289498285,
+  "tekstmodell_samme_lesing": 0.47337278106508873,
+  "agent_rangert_samme_lesing": 0.6686390532544378
+ },
+ "alternativ": {
+  "grense": 0.9,
+  "saker": 3448,
+  "mot_styret": 169,
+  "til_menneske": 708,
+  "til_menneske_andel": 0.20533642691415313,
+  "mot_i_menneskebunken": 121,
+  "egne_flagg": {
+   "accuracy": 0.9547563805104409,
+   "presisjon": 1.0,
+   "recall": 0.07692307692307693,
+   "tp": 13,
+   "fp": 0,
+   "fn": 156,
+   "flagget": 13,
+   "recall_ki": [
+    0.03976271186440678,
+    0.1198311720088084
+   ],
+   "presisjon_ki": [
+    1.0,
+    1.0
+   ]
+  },
+  "leses": 721,
+  "leses_andel": 0.20910672853828308,
+  "fanger": {
+   "accuracy": 0.8196055684454756,
+   "presisjon": 0.18585298196948682,
+   "recall": 0.7928994082840237,
+   "tp": 134,
+   "fp": 587,
+   "fn": 35,
+   "flagget": 721,
+   "recall_ki": [
+    0.676131221719457,
+    0.8872651836158192
+   ],
+   "presisjon_ki": [
+    0.15205654672912722,
+    0.22483462171408775
+   ]
+  },
+  "oversett": 35,
+  "slipper_gjennom": 2727,
+  "andel_oversett_av_sluppet": 0.012834616795012835,
+  "tekstmodell_samme_lesing": 0.6982248520710059,
+  "agent_rangert_samme_lesing": 0.7928994082840237
+ },
+ "streng_mot": {
+  "fasit": 157,
+  "agent_uten_grense": {
+   "accuracy": 0.9680974477958236,
+   "presisjon": 0.688,
+   "recall": 0.5477707006369427,
+   "tp": 86,
+   "fp": 39,
+   "fn": 71,
+   "flagget": 125,
+   "recall_ki": [
+    0.4414942581115567,
+    0.6503223388305847
+   ],
+   "presisjon_ki": [
+    0.6026409152515347,
+    0.7637115246957766
+   ]
+  }
+ },
+ "avstaa": {
+  "fasit": 5,
+  "foreslaatt": 1,
+  "treff": 0
+ },
+ "etter_kunnskapsgrense": {
+  "uten_grense": {
+   "accuracy": 0.9759036144578314,
+   "presisjon": 0.7142857142857143,
+   "recall": 0.7142857142857143,
+   "tp": 5,
+   "fp": 2,
+   "fn": 2,
+   "flagget": 7,
+   "recall_ki": [
+    0.3333333333333333,
+    1.0
+   ],
+   "presisjon_ki": [
+    0.45454545454545453,
+    1.0
+   ]
+  },
+  "hoved": {
+   "grense": 0.8,
+   "saker": 166,
+   "mot_styret": 7,
+   "til_menneske": 20,
+   "til_menneske_andel": 0.12048192771084337,
+   "mot_i_menneskebunken": 5,
+   "egne_flagg": {
+    "accuracy": 0.9578313253012049,
+    "presisjon": 0.0,
+    "recall": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 7,
+    "flagget": 0,
+    "recall_ki": [
+     0.0,
+     0.0
+    ],
+    "presisjon_ki": [
+     0.0,
+     0.0
+    ]
+   },
+   "leses": 20,
+   "leses_andel": 0.12048192771084337,
+   "fanger": {
+    "accuracy": 0.8975903614457831,
+    "presisjon": 0.25,
+    "recall": 0.7142857142857143,
+    "tp": 5,
+    "fp": 15,
+    "fn": 2,
+    "flagget": 20,
+    "recall_ki": [
+     0.3333333333333333,
+     1.0
+    ],
+    "presisjon_ki": [
+     0.09090909090909091,
+     0.5294117647058824
+    ]
+   },
+   "oversett": 2,
+   "slipper_gjennom": 146,
+   "andel_oversett_av_sluppet": 0.0136986301369863
+  },
+  "ap_agent": 0.42750505607648465,
+  "tekstmodell": {
+   "accuracy": 0.8253012048192772,
+   "presisjon": 0.07692307692307693,
+   "recall": 0.2857142857142857,
+   "tp": 2,
+   "fp": 24,
+   "fn": 5,
+   "flagget": 26,
+   "recall_ki": [
+    0.0,
+    0.6916666666666655
+   ],
+   "presisjon_ki": [
+    0.0,
+    0.19634615384615367
+   ]
+  }
+ },
+ "foer_kunnskapsgrense": {
+  "uten_grense": {
+   "accuracy": 0.9664838513101767,
+   "presisjon": 0.703125,
+   "recall": 0.5555555555555556,
+   "tp": 90,
+   "fp": 38,
+   "fn": 72,
+   "flagget": 128,
+   "recall_ki": [
+    0.4563215102974828,
+    0.6546404973048165
+   ],
+   "presisjon_ki": [
+    0.6177318295739348,
+    0.7767628205128205
+   ]
+  },
+  "hoved": {
+   "grense": 0.8,
+   "saker": 3282,
+   "mot_styret": 162,
+   "til_menneske": 197,
+   "til_menneske_andel": 0.06002437538086532,
+   "mot_i_menneskebunken": 90,
+   "egne_flagg": {
+    "accuracy": 0.9549055453991468,
+    "presisjon": 0.8181818181818182,
+    "recall": 0.1111111111111111,
+    "tp": 18,
+    "fp": 4,
+    "fn": 144,
+    "flagget": 22,
+    "recall_ki": [
+     0.0629139728196332,
+     0.1582758620689655
+    ],
+    "presisjon_ki": [
+     0.6363636363636364,
+     0.9565217391304348
+    ]
+   },
+   "leses": 219,
+   "leses_andel": 0.06672760511882998,
+   "fanger": {
+    "accuracy": 0.9497257769652651,
+    "presisjon": 0.4931506849315068,
+    "recall": 0.6666666666666666,
+    "tp": 108,
+    "fp": 111,
+    "fn": 54,
+    "flagget": 219,
+    "recall_ki": [
+     0.5523834468308014,
+     0.7734970674486803
+    ],
+    "presisjon_ki": [
+     0.42404644616467274,
+     0.5620964525808044
+    ]
+   },
+   "oversett": 54,
+   "slipper_gjennom": 3063,
+   "andel_oversett_av_sluppet": 0.01762977473065622
+  }
+ },
+ "med_mot_i_historikk": {
+  "uten_grense": {
+   "accuracy": 0.9561717352415027,
+   "presisjon": 0.6953125,
+   "recall": 0.6013513513513513,
+   "tp": 89,
+   "fp": 39,
+   "fn": 59,
+   "flagget": 128,
+   "recall_ki": [
+    0.5,
+    0.7023117170599184
+   ],
+   "presisjon_ki": [
+    0.6141672876304024,
+    0.7664112903225807
+   ]
+  },
+  "saker": 2236
+ },
+ "uten_mot_i_historikk": {
+  "uten_grense": {
+   "accuracy": 0.9867986798679867,
+   "presisjon": 0.8571428571428571,
+   "recall": 0.2857142857142857,
+   "tp": 6,
+   "fp": 1,
+   "fn": 15,
+   "flagget": 7,
+   "recall_ki": [
+    0.058823529411764705,
+    0.5592013888888887
+   ],
+   "presisjon_ki": [
+    0.2895833333333334,
+    1.0
+   ]
+  },
+  "saker": 1212
+ },
+ "sitater": {
+  "vurdert": 95,
+  "riktig_seksjon": 0.9578947368421052,
+  "seksjon_i_historikk": 78,
+  "riktig_naar_i_historikk": 0.9615384615384616,
+  "riktig_naar_ikke_i_historikk": 0.9411764705882353,
+  "ikke_i_historikk": 17,
+  "bare_sakstype": 0.5789473684210527
+ },
+ "sakstype_riktig": 0.9019721577726219,
+ "uten_mulige_duplikater": {
+  "fjernet": 32,
+  "uten_grense": {
+   "accuracy": 0.96692037470726,
+   "presisjon": 0.7014925373134329,
+   "recall": 0.562874251497006,
+   "tp": 94,
+   "fp": 40,
+   "fn": 73,
+   "flagget": 134,
+   "recall_ki": [
+    0.46118265916923634,
+    0.6685888704318936
+   ],
+   "presisjon_ki": [
+    0.6210080645161291,
+    0.7744320763289414
+   ]
+  }
+ },
+ "per_aar": {
+  "2025": {
+   "accuracy": 0.962807752750131,
+   "presisjon": 0.7285714285714285,
+   "recall": 0.49514563106796117,
+   "tp": 51,
+   "fp": 19,
+   "fn": 52,
+   "flagget": 70,
+   "recall_ki": [
+    0.34547603305785124,
+    0.64
+   ],
+   "presisjon_ki": [
+    0.5887342436974791,
+    0.8413806254767352
+   ]
+  },
+  "2026": {
+   "accuracy": 0.9720597790773229,
+   "presisjon": 0.676923076923077,
+   "recall": 0.6666666666666666,
+   "tp": 44,
+   "fp": 21,
+   "fn": 22,
+   "flagget": 65,
+   "recall_ki": [
+    0.5603107344632768,
+    0.7893587033121916
+   ],
+   "presisjon_ki": [
+    0.5675142804496038,
+    0.7788129664179103
+   ]
+  }
+ },
+ "per_sakstype": [
+  {
+   "proposal_type": "DIRECTOR_ELECTION",
+   "saker": 1642,
+   "mot": 96,
+   "flagget": 75,
+   "treff": 51
+  },
+  {
+   "proposal_type": "SAY_ON_PAY",
+   "saker": 145,
+   "mot": 15,
+   "flagget": 19,
+   "treff": 10
+  },
+  {
+   "proposal_type": "AUDITOR",
+   "saker": 303,
+   "mot": 13,
+   "flagget": 7,
+   "treff": 7
+  },
+  {
+   "proposal_type": "OTHER_MGMT",
+   "saker": 185,
+   "mot": 12,
+   "flagget": 7,
+   "treff": 6
+  },
+  {
+   "proposal_type": "OTHER_BUSINESS",
+   "saker": 12,
+   "mot": 12,
+   "flagget": 12,
+   "treff": 12
+  },
+  {
+   "proposal_type": "ARTICLES",
+   "saker": 85,
+   "mot": 5,
+   "flagget": 4,
+   "treff": 2
+  },
+  {
+   "proposal_type": "SHP_GOVERNANCE",
+   "saker": 5,
+   "mot": 4,
+   "flagget": 5,
+   "treff": 4
+  },
+  {
+   "proposal_type": "EQUITY_PLAN",
+   "saker": 56,
+   "mot": 3,
+   "flagget": 0,
+   "treff": 0
+  },
+  {
+   "proposal_type": "SHARE_ISSUANCE",
+   "saker": 84,
+   "mot": 2,
+   "flagget": 1,
+   "treff": 0
+  },
+  {
+   "proposal_type": "RPT",
+   "saker": 60,
+   "mot": 2,
+   "flagget": 2,
+   "treff": 1
+  },
+  {
+   "proposal_type": "FIN_STATEMENTS",
+   "saker": 226,
+   "mot": 2,
+   "flagget": 1,
+   "treff": 1
+  },
+  {
+   "proposal_type": "SHP_INDEP_CHAIR",
+   "saker": 1,
+   "mot": 1,
+   "flagget": 1,
+   "treff": 1
+  },
+  {
+   "proposal_type": "DIRECTOR_PAY",
+   "saker": 114,
+   "mot": 1,
+   "flagget": 0,
+   "treff": 0
+  },
+  {
+   "proposal_type": "MERGER",
+   "saker": 10,
+   "mot": 1,
+   "flagget": 0,
+   "treff": 0
+  },
+  {
+   "proposal_type": "SHP_OTHER",
+   "saker": 10,
+   "mot": 0,
+   "flagget": 1,
+   "treff": 0
+  }
+ ],
+ "falske_per_selskap": {
+  "Colruyt Group NV": 3,
+  "The Hartford Insurance Group, Inc.": 2,
+  "CSG Holding Co., Ltd.": 2,
+  "Woolworths Group Limited": 2,
+  "Arbonia AG": 2,
+  "H. Lundbeck A/S": 1,
+  "Tokyo Tatemono Co., Ltd.": 1,
+  "Kempower Oyj": 1
+ },
+ "falske_per_regel": {
+  "3.3.3": 8,
+  "1.3.1": 5,
+  "2.1.1": 3,
+  "1.1.2": 3,
+  "1.1.1": 2,
+  "1.2.3": 2,
+  "6.3.1": 2,
+  "3.2.4": 2
+ },
+ "falske_totalt": 40,
+ "kina_regelverk": {
+  "saker": 14,
+  "mot": 0,
+  "flagget": 2,
+  "treff": 0
+ },
+ "kalibrering": [
+  {
+   "fra": 0.0,
+   "til": 0.6,
+   "saker": 82,
+   "riktig": 0.6097560975609756
+  },
+  {
+   "fra": 0.6,
+   "til": 0.8,
+   "saker": 180,
+   "riktig": 0.85
+  },
+  {
+   "fra": 0.8,
+   "til": 0.9,
+   "saker": 811,
+   "riktig": 0.9642416769420469
+  },
+  {
+   "fra": 0.9,
+   "til": 1.0,
+   "saker": 2375,
+   "riktig": 0.9890526315789474
+  }
+ ],
+ "sus_flagget": 0,
+ "stopp": {
+  "end_turn": 310
+ },
+ "mangler_svar": 0,
+ "kostnad_usd": 6.170329
+}

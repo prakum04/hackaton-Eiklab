@@ -1,0 +1,40 @@
+{
+ "treff_gjentakelser": 75,
+ "treff_nye": 20,
+ "mot_gjentakelser": 85,
+ "mot_nye": 84,
+ "uten_other_business": {
+  "flagg": 123,
+  "treff": 83,
+  "mot": 157
+ },
+ "brukbare_saker": 13324,
+ "selskaper": 193,
+ "moter": 1156,
+ "mot_styret_alle": 744,
+ "mot_bokstavelig": {
+  "fasit": 178,
+  "agent": {
+   "flagg": 147,
+   "treff": 105,
+   "presisjon": 0.7142857142857143,
+   "recall": 0.5898876404494382
+  },
+  "stem_som_styret": {
+   "flagg": 31,
+   "treff": 21,
+   "presisjon": 0.6774193548387096,
+   "recall": 0.11797752808988764
+  }
+ },
+ "med_styret_per_aar": {
+  "2019": 0.9329647546648238,
+  "2020": 0.9442204301075269,
+  "2021": 0.9363934426229508,
+  "2022": 0.9339729119638827,
+  "2023": 0.9528676888131743,
+  "2024": 0.9479553903345725,
+  "2025": 0.9460450497642745,
+  "2026": 0.9571150097465887
+ }
+}

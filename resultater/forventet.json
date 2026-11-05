@@ -1,0 +1,10 @@
+{
+ "saker": 3448,
+ "mot_styret": 169,
+ "presisjon": 0.7037,
+ "recall": 0.5621,
+ "ap_agent": 0.5781,
+ "leses_andel": 0.0693,
+ "fanger": 0.6686,
+ "oversett": 56
+}
