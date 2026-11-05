@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Hackathon: SEC-cache og genererte datafiler
+data_cache/
+votes.csv
+train.csv
+test.csv
