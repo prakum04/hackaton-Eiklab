@@ -173,6 +173,11 @@ class App:
         rader = [agent.tolk_linje(i, l, a) for i, l in enumerate(linjer) if l and not l.startswith("#")]
         if not rader:
             raise ValueError("Sakslisten er tom.")
+        # Ekte saksliste: bruk moetedatoen, saa historikken bare tar med moeter FOER dette.
+        dato = str(data.get("dato") or "")
+        if len(dato) == 10 and dato[4] == "-" and dato[7] == "-":
+            for r in rader:
+                r["moetedato"] = dato
         ut = agent.vurder(rader, self.M, self.KORPUS, self.GJ, self.HIST)
         agent.logg("web", ut, self.M)
         return ut
