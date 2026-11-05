@@ -1,0 +1,1 @@
+{"tid": "2026-11-05T11:55:50", "versjon": "0.1", "input": "test.csv", "input_sha256": "7f37a3c0558144af", "modell_trent": "2026-11-05T11:55:49", "t_mot": 0.765, "t_lav": 0.18225900631743092, "n": 2642, "til_menneske": 272, "injeksjoner": [], "merknad": "Agenten avgir bare anbefalinger. Ingen stemmer sendes - et menneske bekrefter."}

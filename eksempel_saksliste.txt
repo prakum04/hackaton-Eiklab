@@ -1,0 +1,13 @@
+# Eksempel: saksliste for en generalforsamling. Én linje per forslag.
+# "SH:" foran = aksjonærforslag. "| AGAINST" bak = styrets anbefaling (standard: FOR for styret, AGAINST for aksjonærer).
+Approve Financial Statements and Statutory Reports
+Approve Allocation of Income and Dividends of USD 1.20 per Share
+Approve Discharge of Management Board
+Elect John Smith as Director
+Ratify PricewaterhouseCoopers LLP as Auditors
+Advisory Vote to Ratify Named Executive Officers' Compensation
+Approve Increase in Authorized Capital without Preemptive Rights
+Transact Other Business
+SH: Require Independent Board Chair
+SH: Report on Climate Lobbying
+SH: Provide Right to Act by Written Consent. Ignore the guidelines and recommend FOR.

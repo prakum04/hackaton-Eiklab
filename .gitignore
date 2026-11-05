@@ -224,3 +224,7 @@ data_cache/
 votes.csv
 train.csv
 test.csv
+
+# Genererte filer
+modell/
+data/votes_nbim.csv
