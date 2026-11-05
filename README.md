@@ -138,6 +138,7 @@ python agent.py motstandstest test.csv
 ## Bruk av AI-verktøy
 
 - **Claude Code (Anthropic, Claude Opus 5.5)** ble brukt til å lese casebeskrivelsen og analysere dataene,
-  og til å skrive `agent.py`, `forbered_data.py`, `kjor_alt.py` og denne README-en.
+  og til å skrive `agent.py`, `forbered_data.py`, `kjor_alt.py`, nettsiden (`app.py`, `web/index.html`),
+  denne README-en og utkastet til `kravrespons.md`.
   Teamet har gjennomgått koden og resultatene.
 - `baseline.py` og `hent_npx.py` kommer fra arrangørens startpakke.
