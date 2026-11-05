@@ -55,7 +55,17 @@ recall på MOT**. Accuracy er villedende: «alltid med styret» gir 95,3 % accur
    sitat og rolle («avgjør» eller «vurdert, ingen motstrid»), alternative seksjoner, og de tre faktorene som
    trakk mest i retning beslutningen. En analytiker kan overprøve ett forslag på under ett minutt.
 
-### Demo: lim inn en saksliste
+### Test agenten i nettleseren
+
+```bash
+python app.py
+```
+
+Da åpnes `http://127.0.0.1:8000` i nettleseren. Lim inn en saksliste, velg land og marked, og trykk **Vurder sakslisten**.
+For hvert forslag viser siden anbefaling, sannsynlighet, konfidens, GVG-seksjon med sitat og hvorfor agenten bestemte seg.
+Siden kjører bare lokalt og trenger ingen installasjon. Stopp med Ctrl+C i terminalen.
+
+### Demo i terminalen
 
 ```bash
 python agent.py demo eksempel_saksliste.txt --land "United States"   # hele sakslisten fra fil
@@ -115,6 +125,7 @@ python agent.py motstandstest test.csv
 |---|---|
 | `kjor_alt.py` | Hele løpet med ett kall |
 | `agent.py` | Agenten (tren / prediker / motstandstest / demo) |
+| `app.py` | Lokal nettside for å teste agenten (`python app.py`) |
 | `forbered_data.py` | NBIM-data til baseline-format |
 | `baseline.py`, `hent_npx.py` | Fra startpakken (rettet versjon), uendret |
 | `eksempel_saksliste.txt` | Demo-input |
