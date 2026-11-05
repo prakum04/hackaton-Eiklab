@@ -541,27 +541,47 @@ def kmd_motstand(a):
 # ------------------------------------------------------------------ demo
 
 
+def tolk_linje(i, linje, a):
+    """'SH:' foran = aksjonaerforslag. '| AGAINST' bak = styrets anbefaling."""
+    kilde = "ISSUER"
+    if linje.upper().startswith("SH:"):
+        kilde, linje = "SECURITY HOLDER", linje[3:].strip()
+    anbef = "AGAINST" if kilde == "SECURITY HOLDER" else "FOR"
+    if "|" in linje:
+        linje, anbef = [s.strip() for s in linje.rsplit("|", 1)]
+    return {"id": str(i), "forslag": linje, "kilde": kilde, "styrets_anbefaling": anbef.upper(),
+            "land": a.land, "marked": a.marked, "cusip": a.selskap, "utsteder": a.selskap,
+            "moetedato": dt.date.today().isoformat(), "mot_styret": ""}
+
+
 def kmd_demo(a):
-    """Lim inn en saksliste: én linje per forslag. Prefiks 'SH:' = aksjonaerforslag.
-    Valgfritt '| AGAINST' paa slutten = styrets anbefaling (standard FOR for styreforslag,
-    AGAINST for aksjonaerforslag)."""
+    """Vurder en saksliste fra fil, eller skriv forslag interaktivt (uten filnavn eller med '-')."""
     m, korpus, gj, hist = last_modell()
-    tekst = open(a.fil, encoding="utf-8").read() if a.fil != "-" else sys.stdin.read()
-    rader = []
-    for i, linje in enumerate(l.strip() for l in tekst.splitlines()):
-        if not linje or linje.startswith("#"):
-            continue
-        kilde = "ISSUER"
-        if linje.upper().startswith("SH:"):
-            kilde, linje = "SECURITY HOLDER", linje[3:].strip()
-        anbef = "AGAINST" if kilde == "SECURITY HOLDER" else "FOR"
-        if "|" in linje:
-            linje, anbef = [s.strip() for s in linje.rsplit("|", 1)]
-        rader.append({"id": str(i), "forslag": linje, "kilde": kilde, "styrets_anbefaling": anbef.upper(),
-                      "land": a.land, "marked": a.marked, "cusip": a.selskap, "utsteder": a.selskap,
-                      "moetedato": dt.date.today().isoformat(), "mot_styret": ""})
+    if a.fil in (None, "-"):
+        print(f"Interaktiv modus (land: {a.land}). Skriv ett forslag og trykk Enter.")
+        print("  'SH:' foran = aksjonærforslag, '| AGAINST' bak = styrets anbefaling. Tom linje eller 'q' avslutter.")
+        i = 0
+        while True:
+            try:
+                linje = input("\nForslag> ").strip()
+            except (EOFError, KeyboardInterrupt):
+                break
+            if not linje or linje.lower() in ("q", "quit", "exit", "avslutt"):
+                break
+            ut = vurder([tolk_linje(i, linje, a)], m, korpus, gj, hist)
+            logg("interaktiv", ut, m)
+            vis(ut)
+            i += 1
+        return
+    tekst = open(a.fil, encoding="utf-8").read()
+    rader = [tolk_linje(i, l.strip(), a) for i, l in enumerate(tekst.splitlines())
+             if l.strip() and not l.strip().startswith("#")]
     ut = vurder(rader, m, korpus, gj, hist)
     logg(a.fil, ut, m)
+    vis(ut)
+
+
+def vis(ut):
     for r in ut:
         flagg = "  ⚠ INSTRUKSJON I TEKSTEN - til menneske" if r["injeksjon_funnet"] else ""
         print(f"\n[{r['anbefaling']:8}] {r['forslag'][:100]}{flagg}")
@@ -581,7 +601,8 @@ def main():
     mo = sub.add_parser("motstandstest")
     mo.add_argument("fil", nargs="?", default="test.csv")
     de = sub.add_parser("demo")
-    de.add_argument("fil", nargs="?", default="eksempel_saksliste.txt")
+    de.add_argument("fil", nargs="?", default=None,
+                    help="fil med én linje per forslag (f.eks. eksempel_saksliste.txt). Uten fil: interaktiv modus")
     de.add_argument("--land", default="United States")
     de.add_argument("--marked", default="DM")
     de.add_argument("--selskap", default="DEMO")

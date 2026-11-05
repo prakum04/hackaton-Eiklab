@@ -58,8 +58,11 @@ recall på MOT**. Accuracy er villedende: «alltid med styret» gir 95,3 % accur
 ### Demo: lim inn en saksliste
 
 ```bash
-python agent.py demo eksempel_saksliste.txt --land "United States"
+python agent.py demo eksempel_saksliste.txt --land "United States"   # hele sakslisten fra fil
+python agent.py demo --land "Germany"                                # interaktivt: skriv ett forslag, trykk Enter
 ```
+
+I interaktiv modus avslutter du med en tom linje eller `q`.
 
 Én linje per forslag. `SH:` foran betyr aksjonærforslag, og `| AGAINST` bak angir styrets anbefaling.
 
