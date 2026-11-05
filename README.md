@@ -61,9 +61,13 @@ recall på MOT**. Accuracy er villedende: «alltid med styret» gir 95,3 % accur
 python app.py
 ```
 
-Da åpnes `http://127.0.0.1:8000` i nettleseren. Lim inn en saksliste, velg land og marked, og trykk **Vurder sakslisten**.
-For hvert forslag viser siden anbefaling, sannsynlighet, konfidens, GVG-seksjon med sitat og hvorfor agenten bestemte seg.
-Siden kjører bare lokalt og trenger ingen installasjon. Stopp med Ctrl+C i terminalen.
+Da åpnes `http://127.0.0.1:8000` i nettleseren. Siden kjører bare lokalt og trenger ingen installasjon. Stopp med Ctrl+C.
+
+- **Oversikt:** resultatene på testsettet mot baselinene, og en tabell per land og per forslagstype. Klikk på et land for å se selskapene der.
+- **Utforsk selskaper:** velg land og selskap, deretter en generalforsamling. Agenten vurderer hvert punkt, og NBIMs faktiske stemme
+  vises ved siden av. Klikk på et punkt for å se retningslinjen agenten siterte, hva som avgjorde, og NBIMs egen begrunnelse.
+  Møter merket «test» har agenten aldri sett. Møter merket «trening» har den lært av.
+- **Egen saksliste:** lim inn forslag og velg eventuelt et selskap, så bruker agenten historikken.
 
 ### Demo i terminalen
 
@@ -125,7 +129,7 @@ python agent.py motstandstest test.csv
 |---|---|
 | `kjor_alt.py` | Hele løpet med ett kall |
 | `agent.py` | Agenten (tren / prediker / motstandstest / demo) |
-| `app.py` | Lokal nettside for å teste agenten (`python app.py`) |
+| `app.py`, `web/index.html` | Lokal nettside: oversikt, utforsk selskaper, egen saksliste (`python app.py`) |
 | `forbered_data.py` | NBIM-data til baseline-format |
 | `baseline.py`, `hent_npx.py` | Fra startpakken (rettet versjon), uendret |
 | `eksempel_saksliste.txt` | Demo-input |

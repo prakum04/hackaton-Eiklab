@@ -483,7 +483,7 @@ def logg(kilde, ut, m):
     UT.mkdir(exist_ok=True)
     post = {"tid": dt.datetime.now().isoformat(timespec="seconds"), "versjon": VERSJON,
             "input": str(kilde), "input_sha256": hashlib.sha256(open(kilde, "rb").read()).hexdigest()[:16]
-            if os.path.exists(str(kilde)) else "",
+            if os.path.isfile(str(kilde)) else "",
             "modell_trent": m["trent"], "t_mot": m["t_mot"], "t_lav": m["t_lav"],
             "n": len(ut), "til_menneske": sum(r["rute"] == "MENNESKE" for r in ut),
             "injeksjoner": [r["id"] for r in ut if r["injeksjon_funnet"]],

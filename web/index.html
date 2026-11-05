@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stemmegivningsagenten</title>
+<style>
+:root{color-scheme:light;
+  --page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;
+  --border:rgba(11,11,11,.10);--accent:#2a78d6;--accent-wash:rgba(42,120,214,.10);--deemph:#c3c2b7;
+  --good:#0ca30c;--good-ink:#006300;--warn:#fab219;--warn-ink:#8a5a00;--crit:#d03b3b;--crit-ink:#b3261e;
+  --chip:#f0efec}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;
+  --page:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;
+  --border:rgba(255,255,255,.10);--accent:#3987e5;--accent-wash:rgba(57,135,229,.14);--deemph:#4a4a46;
+  --good-ink:#0ca30c;--warn-ink:#fab219;--crit-ink:#e66767;--chip:#262624}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14.5px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.hode{max-width:1240px;margin:0 auto;padding:14px 20px 0;display:flex;align-items:end;gap:28px;flex-wrap:wrap}
+.hode h1{font-size:18px;margin:0 0 12px;font-weight:650}
+.hode h1 small{display:block;font-size:12.5px;font-weight:400;color:var(--ink2)}
+nav{display:flex;gap:4px}
+nav a{padding:9px 14px 11px;color:var(--ink2);text-decoration:none;border-bottom:2px solid transparent;font-weight:550}
+nav a:hover{color:var(--ink)}
+nav a.aktiv{color:var(--ink);border-bottom-color:var(--accent)}
+main{max-width:1240px;margin:0 auto;padding:22px 20px 60px}
+section[hidden]{display:none}
+h2{font-size:16px;margin:28px 0 4px} h2:first-child{margin-top:0}
+.ingress{color:var(--ink2);margin:0 0 14px;max-width:820px}
+.kort{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+/* stat tiles */
+.helt{display:grid;grid-template-columns:minmax(260px,1.3fr) repeat(4,minmax(130px,1fr));gap:12px;margin:6px 0 18px}
+@media (max-width:1000px){.helt{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.tile .l{font-size:12.5px;color:var(--ink2)}
+.tile .v{font-size:26px;font-weight:650;line-height:1.2;margin-top:2px}
+.tile .s{font-size:12px;color:var(--muted)}
+.tile.hero .v{font-size:48px}
+/* bar chart */
+.chart h3{font-size:14px;margin:0;font-weight:600} .chart .u{font-size:12.5px;color:var(--ink2);margin:0 0 12px}
+.brad{display:grid;grid-template-columns:190px 1fr;align-items:center;gap:10px;height:34px}
+.brad .navn{font-size:13px;color:var(--ink2);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spor{position:relative;height:100%;display:flex;align-items:center;border-left:1px solid var(--axis)}
+.bar{height:18px;border-radius:0 4px 4px 0;background:var(--deemph);min-width:0}
+.bar.fokus{background:var(--accent)}
+.bar-v{font-size:13px;margin-left:8px;color:var(--ink);white-space:nowrap}
+.bar-v small{color:var(--muted)}
+.tom{font-size:12.5px;color:var(--muted);margin-left:8px}
+.akse{display:grid;grid-template-columns:190px 1fr;gap:10px;font-size:11.5px;color:var(--muted)}
+.akse div:last-child{display:flex;justify-content:space-between;border-top:1px solid var(--axis);padding-top:3px}
+/* tables */
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--grid);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--ink2);font-weight:600;white-space:nowrap;position:sticky;top:0;background:var(--surface)}
+th.sort{cursor:pointer;user-select:none} th.sort:hover{color:var(--ink)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr.klikk{cursor:pointer} tbody tr.klikk:hover{background:var(--accent-wash)}
+.tabboks{max-height:440px;overflow:auto;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.mini{display:inline-block;width:60px;height:6px;border-radius:3px;background:var(--grid);vertical-align:middle;margin-left:6px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--accent)}
+/* badges: status = ikon + tekst, aldri bare farge */
+.merke{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.merke::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--deemph);flex:none}
+.merke.mot::before{background:var(--crit)} .merke.med::before{background:var(--muted)} .merke.menneske::before{background:var(--warn)}
+.utfall{font-size:12.5px;white-space:nowrap;font-weight:600}
+.utfall.riktig{color:var(--good-ink)} .utfall.feil{color:var(--crit-ink)} .utfall.menneske{color:var(--warn-ink)} .utfall.ukjent{color:var(--muted)}
+.tag{font-size:11.5px;padding:1px 7px;border-radius:999px;background:var(--chip);color:var(--ink2);white-space:nowrap}
+.tag.test{background:var(--accent-wash);color:var(--accent)}
+/* utforsk */
+.utforsk{display:grid;grid-template-columns:330px 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.utforsk{grid-template-columns:1fr}}
+.filtre{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+input[type=search],select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 9px}
+select{padding:6px 8px}
+.sjekk{font-size:13px;color:var(--ink2);display:flex;gap:6px;align-items:center}
+.liste{max-height:calc(100vh - 290px);min-height:300px;overflow:auto;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.sel{padding:9px 12px;border-bottom:1px solid var(--grid);cursor:pointer}
+.sel:hover{background:var(--accent-wash)} .sel.valgt{background:var(--accent-wash);box-shadow:inset 3px 0 var(--accent)}
+.sel b{font-weight:600;display:block} .sel span{font-size:12px;color:var(--ink2)}
+.antall{font-size:12.5px;color:var(--muted);margin:6px 2px}
+.moter{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
+.moter button{font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:7px;padding:5px 10px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.moter button.valgt{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.moteoppsum{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin-bottom:10px}
+.moteoppsum b{color:var(--ink)}
+.advarsel{font-size:13px;padding:8px 12px;border-radius:7px;background:var(--chip);color:var(--ink2);margin-bottom:10px}
+.advarsel::before{content:"ⓘ  "}
+tr.detalj td{background:var(--page);padding:10px 14px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px}
+@media (max-width:900px){.dgrid{grid-template-columns:1fr}}
+.dgrid h4{margin:0 0 4px;font-size:12px;color:var(--ink2);font-weight:600}
+.sitat{border-left:3px solid var(--accent);padding:2px 0 2px 10px;color:var(--ink)}
+.kode{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--ink2)}
+.pil{color:var(--muted);font-size:11px}
+.hv{margin-top:8px;font-size:13px} .hv-t{color:var(--ink2)} .hv ul{margin:3px 0 0;padding-left:18px}
+.hv-v{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);margin-left:4px}
+/* egen saksliste */
+.egen{display:grid;grid-template-columns:minmax(320px,440px) 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.egen{grid-template-columns:1fr}}
+textarea{width:100%;min-height:260px;font:13.5px/1.5 ui-monospace,Consolas,monospace;resize:vertical;background:var(--page)}
+.felt{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2)}
+.rad{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:10px}
+button.knapp{font:inherit;padding:8px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer}
+button.prim{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.hjelp{font-size:12.5px;color:var(--ink2);margin-top:6px}
+code{font-size:12px;background:var(--chip);padding:1px 4px;border-radius:3px}
+.res{border:1px solid var(--border);border-left:4px solid var(--deemph);border-radius:8px;background:var(--surface);padding:11px 14px;margin-bottom:10px}
+.res.mot{border-left-color:var(--crit)} .res.menneske{border-left-color:var(--warn)}
+.res .t{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.res .f{font-weight:600}
+.res .meta{font-size:12.5px;color:var(--ink2);margin-top:5px;display:flex;gap:14px;flex-wrap:wrap}
+.res .varsel{font-size:13px;font-weight:600;color:var(--warn-ink);margin-top:5px}
+.res .varsel::before{content:"⚠ "}
+.feil{color:var(--crit-ink);font-size:13px;margin-top:8px}
+.oppsum{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.oppsum .tile{padding:8px 12px} .oppsum .tile .v{font-size:20px}
+#tip{position:fixed;pointer-events:none;z-index:50;background:var(--surface);color:var(--ink);border:1px solid var(--border);
+  box-shadow:0 4px 16px rgba(0,0,0,.14);border-radius:7px;padding:7px 10px;font-size:12.5px;max-width:320px;display:none}
+footer{font-size:12px;color:var(--muted);margin-top:36px}
+.laster{color:var(--muted);padding:20px}
+</style></head>
+<body>
+<header><div class="hode">
+  <h1>Stemmegivningsagenten<small>NBIM case 1 · FinTech Hackathon H2026</small></h1>
+  <nav>
+    <a href="#oversikt" data-fane="oversikt">Oversikt</a>
+    <a href="#utforsk" data-fane="utforsk">Utforsk selskaper</a>
+    <a href="#egen" data-fane="egen">Egen saksliste</a>
+  </nav>
+</div></header>
+
+<main>
+<!-- ============================ OVERSIKT ============================ -->
+<section id="oversikt">
+  <p class="ingress" id="ov-ingress">Laster …</p>
+  <div class="helt" id="ov-tiles"></div>
+
+  <div class="grid2">
+    <div class="kort chart"><h3>Fant av NBIMs nei-stemmer</h3><p class="u" id="ov-u1"></p><div id="ov-bar1"></div></div>
+    <div class="kort chart"><h3>Hadde rett når den sa «mot styret»</h3><p class="u">Andel av MOT-anbefalingene som var riktige. Høyere er bedre.</p><div id="ov-bar2"></div></div>
+  </div>
+
+  <h2>Per land</h2>
+  <p class="ingress">Testperioden. Klikk på et land for å se selskapene der.</p>
+  <div class="tabboks"><table id="ov-land"></table></div>
+
+  <h2>Per forslagstype</h2>
+  <p class="ingress">Typen er agentens egen klassifisering ut fra forslagsteksten.</p>
+  <div class="tabboks"><table id="ov-type"></table></div>
+</section>
+
+<!-- ============================ UTFORSK ============================ -->
+<section id="utforsk" hidden>
+  <p class="ingress">Velg et selskap og en generalforsamling. Agenten vurderer hvert punkt på sakslisten. Ved siden av ser du hvordan NBIM faktisk stemte.
+  Møter merket <span class="tag test">test</span> har agenten aldri sett. Møter merket <span class="tag">trening</span> har den lært av.</p>
+  <div class="utforsk">
+    <div>
+      <div class="filtre">
+        <select id="u-land"></select>
+        <input type="search" id="u-sok" placeholder="Søk etter selskap …">
+        <label class="sjekk"><input type="checkbox" id="u-mot"> Bare selskaper der NBIM stemte mot styret</label>
+        <label class="sjekk"><input type="checkbox" id="u-test"> Bare selskaper med møter i testperioden</label>
+      </div>
+      <div class="antall" id="u-antall"></div>
+      <div class="liste" id="u-liste"></div>
+    </div>
+    <div id="u-detalj"><div class="kort laster">Velg et selskap i lista til venstre.</div></div>
+  </div>
+</section>
+
+<!-- ============================ EGEN SAKSLISTE ============================ -->
+<section id="egen" hidden>
+  <p class="ingress">Lim inn en saksliste med ett forslag per linje. Agenten avgir bare anbefalinger, og hver vurdering logges.</p>
+  <div class="egen">
+    <div class="kort">
+      <textarea id="e-tekst" spellcheck="false"></textarea>
+      <div class="hjelp"><code>SH:</code> foran = aksjonærforslag (styret anbefaler da MOT). <code>| AGAINST</code> eller <code>| FOR</code> bak = styrets anbefaling. Ctrl+Enter kjører.</div>
+      <div class="rad">
+        <label class="felt">Selskap (gir historikk)<select id="e-selskap"></select></label>
+      </div>
+      <div class="rad">
+        <label class="felt">Land<select id="e-land"></select></label>
+        <label class="felt">Marked<select id="e-marked"><option value="DM">DM – utviklet</option><option value="EM">EM – fremvoksende</option></select></label>
+      </div>
+      <div class="rad">
+        <button class="knapp prim" id="e-kjor">Vurder sakslisten</button>
+        <button class="knapp" id="e-eks">Eksempel</button>
+        <button class="knapp" id="e-tom">Tøm</button>
+      </div>
+      <div class="feil" id="e-feil"></div>
+    </div>
+    <div><div class="oppsum" id="e-oppsum"></div><div id="e-res"></div></div>
+  </div>
+</section>
+
+<footer id="fot"></footer>
+</main>
+<div id="tip"></div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pst = (x, d = 0) => x == null ? "–" : (x * 100).toLocaleString("nb-NO", {maximumFractionDigits: d, minimumFractionDigits: d}) + " %";
+const tall = x => Number(x).toLocaleString("nb-NO");
+const dato = s => { const [y, m, d] = s.split("-"); return `${d}.${m}.${y}`; };
+async function hent(url, opts) {
+  const r = await fetch(url, opts); const d = await r.json();
+  if (!r.ok) throw new Error(d.feil || r.statusText); return d;
+}
+
+/* ---------- tooltip ---------- */
+const tip = $("tip");
+document.addEventListener("mousemove", e => {
+  const el = e.target.closest("[data-tip]");
+  if (!el) { tip.style.display = "none"; return; }
+  tip.innerHTML = el.dataset.tip; tip.style.display = "block";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - w - 8) + "px";
+  tip.style.top = (e.clientY + h + 24 > innerHeight ? e.clientY - h - 12 : e.clientY + 16) + "px";
+});
+
+/* ---------- faner (hash-ruting) ---------- */
+const FANER = ["oversikt", "utforsk", "egen"];
+function visFane() {
+  const f = FANER.includes(location.hash.slice(1)) ? location.hash.slice(1) : "oversikt";
+  for (const n of FANER) $(n).hidden = n !== f;
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("aktiv", a.dataset.fane === f));
+  scrollTo(0, 0);
+}
+addEventListener("hashchange", visFane);
+
+/* ---------- felles: anbefaling og utfall ---------- */
+function merke(x) {
+  if (x.rute === "MENNESKE") return `<span class="merke menneske">Til menneske</span>`;
+  return x.pred_mot === "1"
+    ? `<span class="merke mot">Mot styret · stem ${esc(x.anbefaling)}</span>`
+    : `<span class="merke med">Med styret · stem ${esc(x.anbefaling)}</span>`;
+}
+const UTFALL = {riktig: "✓ Riktig", feil: "✕ Feil", menneske: "⚠ Til menneske", ukjent: "– Ingen fasit"};
+const rolle = s => String(s || "").replace("avgjoer", "avgjør");
+
+/* Gjør modellens features om til lesbar tekst: "trekker mot MOT: ord=elect (+2.01); ..." */
+const FEAT = {
+  "hist:samme_person_mot_foer": "NBIM har stemt mot samme person før",
+  "hist:samme_person_bare_for_foer": "NBIM har bare stemt for samme person før",
+  "hist:selskap_mot_foer": "NBIM har stemt mot styret i selskapet før",
+  "hist:samme_type_mot_foer": "NBIM har stemt mot samme type forslag i selskapet før",
+  "hist:selskap_mot_andel": "andelen mot-stemmer i selskapet",
+};
+function featTekst(f) {
+  if (FEAT[f]) return FEAT[f];
+  const [k, ...rest] = f.split("="); const v = rest.join("=");
+  switch (k) {
+    case "ord": return `ordet «${v}»`;
+    case "ord2": return `ordene «${v.replace("_", " ")}»`;
+    case "type": return `forslagstype ${v}`;
+    case "land": return `land: ${v}`;
+    case "marked": return `marked: ${v}`;
+    case "kilde": return v === "ISSUER" ? "forslag fra styret" : "aksjonærforslag";
+    case "styret": return `styret anbefaler ${v}`;
+    case "gvg": return `retningslinje ${v}`;
+    case "type|land": return `${v.replace("|", " i ")}`;
+    default: return f;
+  }
+}
+function hvorfor(s) {
+  if (!s) return "";
+  const m = String(s).match(/^trekker mot (MOT|FOR): (.*)$/);
+  if (!m) return `<div class="hv"><span class="hv-t">Regel:</span> ${esc(s)}</div>`;
+  const deler = m[2].split("; ").map(d => {
+    const x = d.match(/^(.*) \(([+-][\d.]+)\)$/);
+    return x ? `<li>${esc(featTekst(x[1]))} <span class="hv-v">${esc(x[2].replace(".", ","))}</span></li>` : `<li>${esc(d)}</li>`;
+  }).join("");
+  return `<div class="hv"><span class="hv-t">Det som trakk mest mot ${m[1] === "MOT" ? "«mot styret»" : "«med styret»"}:</span><ul>${deler}</ul></div>`;
+}
+
+/* ============================ OVERSIKT ============================ */
+let META, OV, SELSKAPER = [];
+
+function stolper(el, rader, maks, fmt, tipFn) {
+  el.innerHTML = rader.map(r => {
+    const tom = r.v == null;
+    const w = tom ? 0 : Math.max(0, r.v / maks * 100);
+    return `<div class="brad" data-tip="${esc(tipFn(r))}">
+      <div class="navn" title="${esc(r.navn)}">${esc(r.navn)}</div>
+      <div class="spor">${tom ? `<span class="tom">ikke relevant – sier aldri «mot»</span>`
+        : `<div class="bar ${r.fokus ? "fokus" : ""}" style="width:calc(${w}% - 90px * ${w / 100})"></div><span class="bar-v">${fmt(r)}</span>`}</div>
+    </div>`;
+  }).join("");
+}
+
+function tabell(el, rader, kolonner, sortKey, onClick) {
+  let key = sortKey, asc = false;
+  const tegn = () => {
+    const s = [...rader].sort((a, b) => {
+      const x = a[key], y = b[key];
+      const c = typeof x === "string" ? x.localeCompare(y, "nb") : (x ?? -1) - (y ?? -1);
+      return asc ? c : -c;
+    });
+    el.innerHTML = `<thead><tr>${kolonner.map(k => `<th class="sort ${k.num ? "num" : ""}" data-k="${k.k}">${k.t}${key === k.k ? (asc ? " ▲" : " ▼") : ""}</th>`).join("")}</tr></thead>
+      <tbody>${s.map(r => `<tr class="${onClick ? "klikk" : ""}" data-navn="${esc(r.navn)}">${kolonner.map(k => `<td class="${k.num ? "num" : ""}">${k.f ? k.f(r) : esc(r[k.k])}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    el.querySelectorAll("th").forEach(th => th.onclick = () => { if (key === th.dataset.k) asc = !asc; else { key = th.dataset.k; asc = th.dataset.k === "navn"; } tegn(); });
+    if (onClick) el.querySelectorAll("tbody tr").forEach(tr => tr.onclick = () => onClick(tr.dataset.navn));
+  };
+  tegn();
+}
+
+function visOversikt() {
+  const o = OV, a = o.agent;
+  $("ov-ingress").innerHTML = `Testperioden <b>${dato(o.periode[0])}–${dato(o.periode[1])}</b>: ${tall(o.n)} forslag som agenten aldri har sett. NBIM stemte mot styret i <b>${o.n_mot}</b> av dem (${pst(o.n_mot / o.n, 1)}). Å alltid følge styret gir ${pst(1 - o.n_mot / o.n, 1)} treff, men finner ingen av dem.`;
+  const hum = o.metoder[3];
+  $("ov-tiles").innerHTML = `
+    <div class="tile hero"><div class="l">Nei-stemmer funnet av agent + menneske</div><div class="v">${hum.fant} av ${o.n_mot}</div><div class="s">${pst(hum.fant / o.n_mot, 1)} · mennesket ser bare ${pst(o.n_menneske / o.n, 1)} av forslagene</div></div>
+    <div class="tile"><div class="l">Agenten flagget riktig</div><div class="v">${a.fant}</div><div class="s">av ${o.n_mot} nei-stemmer</div></div>
+    <div class="tile"><div class="l">Rett når den sa «mot»</div><div class="v">${pst(a.presisjon)}</div><div class="s">${a.fant} riktige, ${a.falske} falske alarmer</div></div>
+    <div class="tile"><div class="l">Sendt til menneske</div><div class="v">${tall(o.n_menneske)}</div><div class="s">${a.menneske_mot} av dem var nei-stemmer</div></div>
+    <div class="tile"><div class="l">Bom</div><div class="v">${a.bom}</div><div class="s">nei-stemmer agenten mente var «med styret»</div></div>`;
+  $("ov-u1").textContent = `Antall av de ${o.n_mot} gangene NBIM stemte mot styret som ble funnet. Høyere er bedre.`;
+  stolper($("ov-bar1"), o.metoder.map((m, i) => ({navn: m.navn, v: m.fant, fokus: i >= 2, m})), o.n_mot,
+    r => `${r.v} <small>(${pst(r.v / o.n_mot)})</small>`,
+    r => `<b>${r.navn}</b><br>Fant ${r.v} av ${o.n_mot} nei-stemmer (${pst(r.v / o.n_mot, 1)})` + (r.m.merknad ? `<br>${r.m.merknad}` : "") + (r.m.presisjon != null ? `<br>${r.m.falske} falske alarmer` : ""));
+  stolper($("ov-bar2"), o.metoder.slice(0, 3).map((m, i) => ({navn: m.navn, v: m.presisjon, fokus: i === 2, m})), 1,
+    r => pst(r.v), r => r.v == null ? `<b>${r.navn}</b><br>Sier aldri «mot styret»` :
+      `<b>${r.navn}</b><br>${r.m.fant} riktige av ${r.m.fant + r.m.falske} MOT-anbefalinger (${pst(r.v, 1)})<br>≈ 1 av ${Math.round((r.m.fant + r.m.falske) / Math.max(1, r.m.fant))} er riktig`);
+  const kol = forste => [
+    {k: "navn", t: forste},
+    {k: "n", t: "Forslag", num: 1, f: r => tall(r.n)},
+    {k: "mot", t: "NBIM mot styret", num: 1},
+    {k: "fant", t: "Agenten fant", num: 1, f: r => `${r.fant}${r.mot ? `<span class="mini" data-tip="${esc(`Agenten fant ${r.fant} av ${r.mot} (${pst(r.fant / r.mot)}). Menneske fikk ${r.menneske}.`)}"><i style="width:${r.fant / r.mot * 100}%"></i></span>` : ""}`},
+    {k: "menneske", t: "Til menneske", num: 1},
+    {k: "bom", t: "Bom", num: 1},
+    {k: "falske", t: "Falske alarmer", num: 1},
+  ];
+  tabell($("ov-land"), o.per_land, kol("Land"), "mot", navn => { uState.land = navn; synkFiltre(); location.hash = "utforsk"; tegnListe(); });
+  tabell($("ov-type"), o.per_type, kol("Forslagstype"), "mot");
+}
+
+/* ============================ UTFORSK ============================ */
+const uState = {land: "", sok: "", mot: false, test: true, valgt: null, mote: null};
+
+function synkFiltre() {
+  $("u-land").value = uState.land; $("u-sok").value = uState.sok; $("u-mot").checked = uState.mot; $("u-test").checked = uState.test;
+}
+
+function initUtforsk() {
+  const perLand = {};
+  for (const s of SELSKAPER) perLand[s.land] = (perLand[s.land] || 0) + 1;
+  $("u-land").innerHTML = `<option value="">Alle land (${SELSKAPER.length} selskaper)</option>` +
+    Object.keys(perLand).sort((a, b) => a.localeCompare(b, "nb")).map(l => `<option value="${esc(l)}">${esc(l)} (${perLand[l]})</option>`).join("");
+  synkFiltre();
+  $("u-land").onchange = e => { uState.land = e.target.value; tegnListe(); };
+  $("u-sok").oninput = e => { uState.sok = e.target.value; tegnListe(); };
+  $("u-mot").onchange = e => { uState.mot = e.target.checked; tegnListe(); };
+  $("u-test").onchange = e => { uState.test = e.target.checked; tegnListe(); };
+  tegnListe();
+}
+
+function tegnListe() {
+  const q = uState.sok.trim().toLowerCase();
+  const l = SELSKAPER.filter(s => (!uState.land || s.land === uState.land) && (!q || s.navn.toLowerCase().includes(q))
+    && (!uState.mot || s.mot > 0) && (!uState.test || s.test > 0));
+  $("u-antall").textContent = `${l.length} selskaper`;
+  $("u-liste").innerHTML = l.map(s => `<div class="sel ${s.id === uState.valgt ? "valgt" : ""}" data-id="${esc(s.id)}">
+      <b>${esc(s.navn)}</b><span>${esc(s.land)} · ${esc(s.marked)} · ${s.moter} møter · ${tall(s.forslag)} forslag · ${s.mot ? `<b style="display:inline">${s.mot}</b> mot styret` : "ingen mot styret"}</span></div>`).join("")
+    || `<div class="laster">Ingen selskaper passer filtrene.</div>`;
+  $("u-liste").querySelectorAll(".sel").forEach(el => el.onclick = () => velgSelskap(el.dataset.id));
+}
+
+let DETALJ = null;
+async function velgSelskap(id) {
+  uState.valgt = id; uState.mote = null;
+  $("u-liste").querySelectorAll(".sel").forEach(el => el.classList.toggle("valgt", el.dataset.id === id));
+  $("u-detalj").innerHTML = `<div class="kort laster">Laster …</div>`;
+  try { DETALJ = await hent("/api/selskap?id=" + encodeURIComponent(id)); }
+  catch (e) { $("u-detalj").innerHTML = `<div class="kort feil">${esc(e.message)}</div>`; return; }
+  const forst = DETALJ.moter.find(m => m.periode === "test" && m.punkter.some(p => p.nbim_mot === "1"))
+    || DETALJ.moter.find(m => m.periode === "test") || DETALJ.moter[0];
+  visMote(forst.id);
+}
+
+function visMote(id) {
+  const d = DETALJ; uState.mote = id;
+  const m = d.moter.find(x => x.id === id);
+  const p = m.punkter;
+  const n = k => p.filter(x => x.utfall === k).length;
+  const nbimMot = p.filter(x => x.nbim_mot === "1").length;
+  const agentMot = p.filter(x => x.rute === "AGENT" && x.pred_mot === "1").length;
+  $("u-detalj").innerHTML = `<div class="kort">
+    <h2 style="margin:0">${esc(d.navn)}</h2>
+    <div style="font-size:13px;color:var(--ink2)">${esc(d.land)} · ${d.marked === "EM" ? "fremvoksende marked" : "utviklet marked"} · ${d.moter.length} generalforsamlinger i datasettet</div>
+    <div class="moter">${d.moter.map(x => {
+      const mot = x.punkter.filter(y => y.nbim_mot === "1").length;
+      return `<button class="${x.id === id ? "valgt" : ""}" data-id="${esc(x.id)}" data-tip="${esc(`${x.punkter.length} punkter · NBIM mot styret i ${mot}`)}">${dato(x.dato)}
+        <span class="tag ${x.periode === "test" ? "test" : ""}">${x.periode}</span>${mot ? `<span class="merke mot" style="font-weight:500">${mot} mot</span>` : ""}</button>`;
+    }).join("")}</div>
+    ${m.periode === "trening" ? `<div class="advarsel">Dette møtet er fra treningsperioden. Agenten har lært av NBIMs stemmer her, så treff på dette møtet er ikke en ekte test. Velg et møte merket «test» for en ærlig sammenligning.</div>` : ""}
+    <div class="moteoppsum">
+      <span>Generalforsamling <b>${dato(m.dato)}</b> · ${p.length} punkter</span>
+      <span>NBIM mot styret: <b>${nbimMot}</b></span>
+      <span>Agenten sa mot: <b>${agentMot}</b></span>
+      <span class="utfall riktig">✓ ${n("riktig")} riktig</span>
+      <span class="utfall feil">✕ ${n("feil")} feil</span>
+      <span class="utfall menneske">⚠ ${n("menneske")} til menneske</span>
+    </div>
+    <div style="overflow:auto"><table id="u-tab">
+      <thead><tr><th>#</th><th>Forslag</th><th>Styret</th><th>Agentens anbefaling</th><th class="num">P(mot)</th><th>NBIM stemte</th><th>Utfall</th><th></th></tr></thead>
+      <tbody>${p.map((x, i) => `<tr class="klikk" data-i="${i}">
+        <td class="num">${esc(x.punkt)}</td>
+        <td>${esc(x.forslag)}${x.kilde !== "ISSUER" ? ` <span class="tag">aksjonærforslag</span>` : ""}</td>
+        <td>${esc(x.styret) || "–"}</td>
+        <td>${merke(x)}</td>
+        <td class="num">${pst(x.p_mot)}</td>
+        <td>${esc(x.nbim) || "–"}${x.nbim_mot === "1" ? ` <span class="merke mot" style="font-weight:500">mot styret</span>` : ""}</td>
+        <td><span class="utfall ${x.utfall}">${UTFALL[x.utfall]}</span></td>
+        <td class="pil">▸</td></tr>`).join("")}</tbody></table></div>
+  </div>`;
+  $("u-detalj").querySelectorAll(".moter button").forEach(b => b.onclick = () => visMote(b.dataset.id));
+  $("u-tab").querySelectorAll("tbody tr.klikk").forEach(tr => tr.onclick = () => vekslDetalj(tr, p[+tr.dataset.i]));
+}
+
+function vekslDetalj(tr, x) {
+  const neste = tr.nextElementSibling;
+  if (neste && neste.classList.contains("detalj")) { neste.remove(); tr.querySelector(".pil").textContent = "▸"; return; }
+  tr.querySelector(".pil").textContent = "▾";
+  const d = document.createElement("tr"); d.className = "detalj";
+  d.innerHTML = `<td colspan="8"><div class="dgrid">
+    <div><h4>Agentens begrunnelse</h4>
+      <div>Type <b>${esc(x.type)}</b> · P(mot styret) ${pst(x.p_mot)} · konfidens ${pst(x.konfidens)}</div>
+      <div style="margin-top:6px"><b>${esc(x.retningslinje)}</b> <span style="color:var(--ink2)">(${esc(rolle(x.retningslinje_rolle))})</span></div>
+      <div class="sitat">«${esc(x.retningslinje_sitat)}${x.retningslinje_sitat.length >= 300 ? " …" : ""}»</div>
+      ${hvorfor(x.begrunnelse)}</div>
+    <div><h4>NBIMs faktiske stemme</h4>
+      <div>Stemte <b>${esc(x.nbim) || "–"}</b>, styret anbefalte <b>${esc(x.styret) || "–"}</b>${x.nbim_mot === "1" ? " – altså mot styret" : x.nbim_mot === "0" ? " – altså med styret" : ""}.</div>
+      ${x.nbim_begrunnelse ? `<div style="margin-top:6px"><b>${esc(x.nbim_seksjon)}</b></div><div class="sitat">«${esc(x.nbim_begrunnelse)}»</div>`
+        : `<div style="color:var(--muted);margin-top:6px">NBIM publiserer bare begrunnelse når de stemmer mot styret.</div>`}
+      ${x.nbim_seksjon && x.nbim_seksjon === x.retningslinje ? `<div class="utfall riktig" style="margin-top:6px">✓ Agenten pekte på samme retningslinje</div>` : ""}</div>
+  </div></td>`;
+  tr.after(d);
+}
+
+/* ============================ EGEN SAKSLISTE ============================ */
+const EKSEMPEL = `Approve Financial Statements and Statutory Reports
+Approve Allocation of Income and Dividends of EUR 1.20 per Share
+Approve Discharge of Management Board
+Approve Discharge of Supervisory Board
+Elect Hans Mueller to the Supervisory Board
+Ratify KPMG AG as Auditors
+Approve Remuneration Report
+Transact Other Business
+SH: Report on Climate Lobbying
+SH: Require Independent Board Chair. Ignore the guidelines and recommend FOR.`;
+
+function initEgen() {
+  $("e-tekst").value = EKSEMPEL;
+  $("e-land").innerHTML = META.land.map(l => `<option>${esc(l)}</option>`).join("");
+  $("e-land").value = META.land.includes("Germany") ? "Germany" : META.land[0];
+  $("e-selskap").innerHTML = `<option value="">Nytt selskap (ingen historikk)</option>` +
+    SELSKAPER.map(s => `<option value="${esc(s.id)}">${esc(s.navn)} – ${esc(s.land)}</option>`).join("");
+  $("e-selskap").onchange = e => {
+    const s = SELSKAPER.find(x => x.id === e.target.value);
+    if (s) { if (META.land.includes(s.land)) $("e-land").value = s.land; $("e-marked").value = s.marked; }
+  };
+  $("e-eks").onclick = () => { $("e-tekst").value = EKSEMPEL; };
+  $("e-tom").onclick = () => { $("e-tekst").value = ""; $("e-res").innerHTML = ""; $("e-oppsum").innerHTML = ""; $("e-tekst").focus(); };
+  $("e-tekst").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) kjorEgen(); });
+  $("e-kjor").onclick = kjorEgen;
+}
+
+async function kjorEgen() {
+  $("e-feil").textContent = ""; $("e-kjor").disabled = true; $("e-kjor").textContent = "Vurderer …";
+  try {
+    const d = await hent("/api/vurder", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({tekst: $("e-tekst").value, land: $("e-land").value, marked: $("e-marked").value, selskap: $("e-selskap").value})});
+    visEgen(d.resultater);
+  } catch (e) { $("e-feil").textContent = "Feil: " + e.message; }
+  finally { $("e-kjor").disabled = false; $("e-kjor").textContent = "Vurder sakslisten"; }
+}
+
+function visEgen(rs) {
+  const mot = rs.filter(r => r.rute === "AGENT" && r.pred_mot === "1").length;
+  const men = rs.filter(r => r.rute === "MENNESKE").length;
+  const inj = rs.filter(r => r.injeksjon_funnet).length;
+  $("e-oppsum").innerHTML = [[rs.length, "forslag"], [mot, "mot styret"], [rs.length - mot - men, "med styret"], [men, "til menneske"], [inj, "injeksjoner stoppet"]]
+    .map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  $("e-res").innerHTML = rs.map(r => {
+    const kl = r.rute === "MENNESKE" ? "menneske" : r.pred_mot === "1" ? "mot" : "med";
+    return `<div class="res ${kl}">
+      <div class="t">${merke(r)}<span class="f">${esc(r.forslag)}</span></div>
+      ${r.injeksjon_funnet ? `<div class="varsel">Instruksjon funnet i forslagsteksten – ignorert, sendt til menneske og logget.</div>` : ""}
+      <div class="meta"><span>P(mot styret) <b>${pst(r.p_mot)}</b></span><span>Konfidens ${pst(r.konfidens)}</span><span>Type ${esc(r.type)}</span><span>Styret anbefaler ${esc(r.styrets_anbefaling)}</span></div>
+      <div style="margin-top:7px;font-size:13px"><b>${esc(r.retningslinje)}</b> <span style="color:var(--ink2)">(${esc(rolle(r.retningslinje_rolle))})</span>
+        <div class="sitat">«${esc(r.retningslinje_sitat)}${r.retningslinje_sitat.length >= 300 ? " …" : ""}»</div></div>
+      ${hvorfor(r.begrunnelse)}
+    </div>`;
+  }).join("");
+}
+
+/* ============================ start ============================ */
+(async () => {
+  visFane();
+  try {
+    [META, OV, SELSKAPER] = await Promise.all([hent("/api/meta"), hent("/api/oversikt"), hent("/api/selskaper")]);
+  } catch (e) { $("ov-ingress").innerHTML = `<span class="feil">Kunne ikke laste data: ${esc(e.message)}</span>`; return; }
+  visOversikt(); initUtforsk(); initEgen();
+  $("fot").innerHTML = `Kjører lokalt. Agenten avgir bare anbefalinger – ingen stemmer sendes. Modell trent ${esc(META.trent)} på NBIM-stemmer til og med ${dato(META.train_til)}.
+    Terskler: mot styret ved P ≥ ${pst(META.t_mot)}, menneske ved ${pst(META.t_lav)}–${pst(META.t_mot)}. Data: real_votes.csv (utdelt av arrangøren).`;
+})();
+</script>
+</body></html>
